@@ -1,0 +1,16 @@
+# local config is being used for running component locally for testing and debugging purposes
+
+server:
+  apiVersion: v1
+  address: ":8443"
+  readTimeout: 10s
+  writeTimeout: 10s  
+
+logger:
+  level: debug
+  addCaller: true
+  outputPaths:
+    - stdout
+
+database:
+  DSN: "localhost"

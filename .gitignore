@@ -1,0 +1,18 @@
+# golang idea files
+.idea
+.vscode
+
+# libries and build artifacts
+build/
+bin/
+
+# test results
+coverage.out
+coverage.html
+cpu.out
+mem.out
+
+# git diff files
+*.diff
+
+tmp/
