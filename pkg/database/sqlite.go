@@ -47,11 +47,11 @@ func connectDatabase() (*sql.DB, error) {
 		return nil, err
 	}
 
-	if conn, err = sql.Open("sqlite3", dsn); err != nil {
+	if conn, err = sql.Open(config.TheConfig().Database.Dialect, dsn); err != nil {
 		return nil, err
 	}
 
-	if err = Migrate(conn); err != nil {
+	if err = migrate(conn); err != nil {
 		return nil, fmt.Errorf("error migrating database - %s", err)
 	}
 

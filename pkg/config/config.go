@@ -16,6 +16,9 @@ type Server struct {
 	Address     string
 	ReadTimeout time.Duration
 	WriteTemout time.Duration
+	PrivateKey  string
+	Certificate string
+	Insecure    bool
 }
 
 // Logger config section
@@ -27,7 +30,14 @@ type Logger struct {
 
 // Database config section
 type Database struct {
-	DSN string
+	DSN     string
+	Dialect string
+}
+
+// GeoIP database config section
+type GeoIP struct {
+	UseGeoIP   bool
+	DBFileName string
 }
 
 // Config is a complete config structure

@@ -40,7 +40,7 @@ func (*sku) get(_ http.ResponseWriter, r *http.Request) (interface{}, int, error
 
 	if result, err = cm.FindBy(packageName, countryCode, percentileSeed); err != nil {
 		if err == models.ErrNotFound {
-			return nil, http.StatusNotFound, fmt.Errorf("error finding SKU for packageName '%s'", packageName)
+			return nil, http.StatusNotFound, fmt.Errorf("no SKU found for packageName '%s'", packageName)
 		}
 		return nil, http.StatusInternalServerError, fmt.Errorf("error finding SKU for packageName '%s' - %s", packageName, err)
 	}

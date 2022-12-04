@@ -2,6 +2,8 @@ package apiserver
 
 import (
 	"context"
+	"crypto/tls"
+	"fmt"
 	"net/http"
 	"time"
 
@@ -21,6 +23,11 @@ type APIHTTPServer struct {
 
 // NewAPIHTTPServer API server constructor
 func NewAPIHTTPServer(cfg config.Server) (*APIHTTPServer, error) {
+	var (
+		cert tls.Certificate
+		err  error
+	)
+
 	s := &APIHTTPServer{
 		apiVersion: cfg.APIVersion,
 		logger:     log.TheLogger().With(zap.String("component", "APIHTTPServer")),
@@ -30,11 +37,27 @@ func NewAPIHTTPServer(cfg config.Server) (*APIHTTPServer, error) {
 		Handler:      handlers.SetupRouter(cfg),
 		ReadTimeout:  cfg.ReadTimeout,
 		WriteTimeout: cfg.WriteTemout,
+		TLSConfig: &tls.Config{
+			Certificates: make([]tls.Certificate, 0),
+			NextProtos:   []string{"http/1.1"},
+			MinVersion:   tls.VersionTLS12,
+			//nolint: gosec
+			InsecureSkipVerify: cfg.Insecure,
+		},
 	}
 
 	if cfg.Address != "" {
 		s.srv.Addr = cfg.Address
 	}
+
+	if cert, err = tls.LoadX509KeyPair(cfg.Certificate, cfg.PrivateKey); err != nil {
+		return nil, fmt.Errorf("error loading key pair - %s", err)
+	}
+
+	s.srv.TLSConfig.Certificates = append(
+		s.srv.TLSConfig.Certificates,
+		cert,
+	)
 
 	return s, nil
 }
@@ -56,7 +79,7 @@ func (s *APIHTTPServer) Run(ctx context.Context) {
 	loggerWithField.With(zap.String("address", s.srv.Addr), zap.String("apiVersion", s.apiVersion)).
 		Info("start server")
 
-	if err := s.srv.ListenAndServe(); err != nil {
+	if err := s.srv.ListenAndServeTLS("", ""); err != nil {
 		loggerWithField.Warn("http server finished with error", zap.Error(err))
 	}
 }

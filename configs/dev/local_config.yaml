@@ -4,7 +4,10 @@ server:
   apiVersion: v1
   address: ":8443"
   readTimeout: 10s
-  writeTimeout: 10s  
+  writeTimeout: 10s 
+  privateKey: test/cert/server.key
+  certificate: test/cert/server.pub
+  insecure: true
 
 logger:
   level: debug
@@ -13,4 +16,9 @@ logger:
     - stdout
 
 database:
-  DSN: "localhost"
+  DSN: "/tmp/models_test.db"
+  dialect: "sqlite3"
+
+geoip:
+  useGeoIP: true
+  dbFileName: fixtures/GeoLite2-Country_20221202/GeoLite2-Country.mmdb
