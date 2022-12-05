@@ -122,3 +122,4 @@ make build
 ## Caveats
 
 - `logger` doesn't create destination directory, so it should be done manually!
+- TLS configuration is `insecure` by default
