@@ -1,26 +1,26 @@
 # TOTO Configuration Server
 
 ## Disclaimer
+
 To simplify testing, deployment and delivery the server uses SQLite as a database backend. It obviously locks server into single instance.  
-To scale it into multiple instances SQLite should be replaced by any RDBMS supported network access. 
+To scale it into multiple instances SQLite should be replaced by any RDBMS supporting network access. 
 It can be easily done by changing `DSN` and `dialect` parameters in config file.
 
 ## Benchmarks
-To reproduce benchmark run `go test -bench=.` inside `toto-config/pkg/apiserver/models`
 
-Here is an example:  
+To reproduce benchmark run `go test -bench=. -benchmem` inside `toto-config/pkg/apiserver/models` first. It will generate random data and stores it into `/tmp/models-test.db` which will be reused. (NOTE: no clean up here, the part of testing.Main which is in charge of cleanup is commented). 
 
-```
-~/toto/pkg/apiserver/models (master*) » go test -bench=.                                    
-2022/12/04 23:19:25 goose: no migrations to run. current version: 1
-Looking for: 41f3476809282d463ee21f589eb398c5f214104947217a6cf7643a984369bad9, fe, 66
+Expected output: 
+
+```sh
+2022/12/05 13:19:39 goose: no migrations to run. current version: 1
+Looking for: 2a950a41dbd5a8d429b79ad1d1abf31293e092589ed4e139dbb57463f883a033, 15, 79
 goos: darwin
 goarch: amd64
 pkg: github.com/3d0c/toto-config/pkg/apiserver/models
 cpu: Intel(R) Core(TM) i7-9750H CPU @ 2.60GHz
-BenchmarkFindBy-12         47558             24538 ns/op
+BenchmarkFindBy-12         48506             24463 ns/op            1384 B/op         42 allocs/op
 PASS
-ok      github.com/3d0c/toto-config/pkg/apiserver/models        2.570s
 ```
 
 ### Apache benchmarks
@@ -49,7 +49,6 @@ Here is the single curl request verbose output
 }
 Total; 0.03784 (sec)
 ```
-
 The result of Apache Benchmark of hitting the single endpoint:
 
 ```sh
@@ -81,9 +80,27 @@ Transfer rate:          754.56 [Kbytes/sec] received
 
 ```
 
+## API
 
+- `GET /v1/sku/{package}`  
 
+  Results:  
+  - 200 OK and valid JSON like:
+  
+    ```json
+    {
+        "main_sku": "7377fdf723eb4ed2a3a52bb869c162fdc621e373cbfe41dc37bfb26eb84c2031"
+    }
+    ```
+    
+  - 404 Not Found
+  - 500 Internal server error
+
+## Improvements
+
+- The `ConfigScheme` data structure is hardcoded. For better integration and maintenance experience code generator might be using here, using JSON scheme format.
+- GeoTarget using `mmdb` database can be detached into another service.
 
 ## Caveats
 
-- logger doesn't create destination directory, so it should be created manually!
+- `logger` doesn't create destination directory, so it should be done manually!
