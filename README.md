@@ -96,6 +96,24 @@ Transfer rate:          754.56 [Kbytes/sec] received
   - 404 Not Found
   - 500 Internal server error
 
+## Build and Run
+
+Just run locally for testing purposes:
+
+```sh
+go run main.go run --config=configs/dev/local_config.yaml
+```
+
+Building:
+
+```sh
+# Do static analysis
+make lint
+
+# Build binary (will be in build/ directory)
+make build
+```
+
 ## Improvements
 
 - The `ConfigScheme` data structure is hardcoded. For better integration and maintenance experience code generator might be using here, using JSON scheme format.
